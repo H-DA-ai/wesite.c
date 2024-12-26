@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>FastTic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Dancing+Script:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            background-color:#033a4a;
+        }
+
+
+        .seat {
+            cursor: pointer;
+        }
+
+        .selected {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            color: white;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #000000;
+            font-family: 'Playfair Display', serif;
+            text-decoration: underline;
+        }
+
+        .screen-icon {
+            width: 100px;
+            height: 25px;
+            background-color: #4a5568;
+            border-top-left-radius: 50px;
+            border-top-right-radius: 50px;
+            margin: 0 auto;
+        }
+
+        .movie-button,
+        .popup-button {
+            background: linear-gradient(to right, #ff7eb9, #ff758c);
+            color: black;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: underlined;
+            display: inline-block;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .movie-button:hover,
+        .popup-button:hover {
+            transform: scale(1.05);
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+    </style>
+    <script>
+        let selectedSeats = [];
+        let selectedSnacks = [];
+        const snackPrices = {
+            'Popcorn': 5.00,
+            'Soda': 3.00,
+            'Nachos': 4.00,
+            'Hot Dog': 4.50,
+            'Candy': 2.50,
+            'Pretzel': 3.50
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const seats = document.querySelectorAll('.seat');
+            seats.forEach(seat => {
+                seat.addEventListener('click', () => {
+                    seat.classList.toggle('selected');
+                    const seatNumber = seat.textContent;
+                    if (selectedSeats.includes(seatNumber)) {
+                        selectedSeats = selectedSeats.filter(s => s !== seatNumber);
+                    } else {
+                        selectedSeats.push(seatNumber);
+                    }
+                    updateCart();
+                });
+            });
+
+            const snackButtons = document.querySelectorAll('.snack-button');
+            snackButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const snackName = event.target.dataset.snack;
+                    if (selectedSnacks.includes(snackName)) {
+                        selectedSnacks = selectedSnacks.filter(s => s !== snackName);
+                    } else {
+                        selectedSnacks.push(snackName);
+                    }
+                    updateCart();
+                });
+            });
+        });
+
+        function updateCart() {
+            const cartItems = document.getElementById('cart-items');
+            const totalPriceElement = document.getElementById('total-price');
+            let total = 0;
+
+            // Clear existing items
+            cartItems.innerHTML = '';
+
+            // Add selected seats to cart
+            selectedSeats.forEach(seat => {
+                const listItem = document.createElement('li');
+                listItem.className = 'flex justify-between';
+                listItem.innerHTML = `
+                    <span class="text-white font-bold mb-2">Seat ${seat}</span>
+                    <span class="text-white font-bold mb-2">$10.00</span>
+                `;
+                cartItems.appendChild(listItem);
+                total += 10.00; // Assuming each seat costs $10
+            });
+
+            // Add selected snacks to cart
+            selectedSnacks.forEach(snack => {
+                const listItem = document.createElement('li');
+                listItem.className = 'flex justify-between';
+                listItem.innerHTML = `
+                    <span class="text-white font-bold mb-2">${snack}</span>
+                    <span class="text-white font-bold mb-2">$${snackPrices[snack].toFixed(2)}</span>
+                `;
+                cartItems.appendChild(listItem);
+                total += snackPrices[snack];
+            });
+
+            // Update total price
+            totalPriceElement.innerText = `$${total.toFixed(2)}`;
+        }
+
+        function showPopup() {
+            document.getElementById('popup').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+
+
+
+        }
+
+        function hidePopup() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+
+
+        }
+    </script>
+</head>
+
+<body class="background-color="#033a4a">
+    <header class="bg-black text-white p-6 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold" style="font-family:Cursive;color:white;">FastTic</h1>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a class="hover:underline" href="#genres">Home</a></li>
+                    <li><a class="hover:underline" href="#genres">Movies</a></li>
+                    <li><a class="hover:underline" href="#snacks">Snacks</a></li>
+                    <li><a class="hover:underline" href="#contact">Contact</a></li>
+                    <li><a class="hover:underline" href="#cart">Cart</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <section class="hero h-64 flex items-center justify-center">
+        <div class="text-center", style:background-color="#033a4a">
+            <h2 class="text-4xl" style="font-family:Impact,Fantasy;color:white;">"Enjoy  Movies  Like  Never  Before!"</h2>
+            <p class="text-lg mb-6"  style="color:white;font-family:OCRA;">Book Your Tickets & Snacks in a Few Clicks!</p>
+        </div>
+    </section>
+    <main class="container mx-auto mt-8">
+        <section class="mb-8" id="genres">
+            <h2 class="text-2xl font-bold text-center mb-6 text-white">Movie Genres</h2>
+
+            <div class="flex overflow-x-auto space-x-4 p-6 bg-black rounded-lg shadow-lg">
+                <div class="flex-none movie-button" onclick="showPopup()">Action</div>
+                <div class="flex-none movie-button">Comedy</div>
+                <div class="flex-none movie-button">Drama</div>
+                <div class="flex-none movie-button">Romance</div>
+                <div class="flex-none movie-button">Sci-Fi</div>
+                 <div class="flex-none movie-button" onclick="showPopup()">Horror</div>
+                <div class="flex-none movie-button">Thriller</div>
+                <div class="flex-none movie-button">Animation</div>
+                <div class="flex-none movie-button">Documentary</div>
+                <div class="flex-none movie-button">Fantasy</div>
+<div class="flex-none movie-button">Musical</div>
+<div class="flex-none movie-button">Oscars</div>
+<div class="flex-none movie-button">rom-com</div>
+            </div>
+        </section>
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-center mb-6 text-white">Available Movies</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-black p-6 rounded-lg shadow-lg transition transform hover:scale-105">
+                    <img alt="SPIDERMAN POSTER" class="w-full h-48 object-cover rounded mb-4" height="200" src="https://i.etsystatic.com/22985714/r/il/e23732/3807163725/il_570xN.3807163725_cuy8.jpg" />
+                    <h3 class="text-white font-bold">Movie 1</h3>
+                    <p class="text-gray-600">SPIDERMAN WONDERS</p>
+                    <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded">Book Now</button>
+                </div>
+                <div class="bg-black p-4 rounded shadow-lg transition transform hover:scale-105">
+                    <img alt="VENOM" class="w-full h-48 object-cover rounded mb-4" height="200" src="https://images.hdqwalls.com/wallpapers/venom-5k-artwork-ww.jpg"/>
+                    <h3 class="text-white font-bold">Movie 2</h3>
+                    <p class="text-gray-600">VENOM</p>
+                    <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded">Book Now</button>
+                </div>
+                <div class="bg-black p-4 rounded shadow-lg transition transform hover:scale-105">
+                    <img alt="batman" class="w-full h-48 object-cover rounded mb-4" height="200" src="https://images.squarespace-cdn.com/content/v1/51b3dc8ee4b051b96ceb10de/1563049468035-Y3CM4T4J6DYL6W2YHYZ9/batman1.jpg" />
+                    <h3 class="text-white font-bold">Movie 3</h3>
+                    <p class="text-gray-600">BATMAN</p>
+                    <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded">Book Now</button>
+                </div>
+            </div>
+        </section>
+
+        <div class="overlay" id="overlay"></div>
+        <div class="popup" id="popup">
+            <div class="bg-black p-6 rounded-lg shadow-lg transition transform hover:scale-105">
+                <img alt="SPIDERMAN POSTER" class="w-full h-48 object-cover rounded mb-4" height="200" src="https://i.etsystatic.com/22985714/r/il/e23732/3807163725/il_570xN.3807163725_cuy8.jpg" />
+                <h3 class="text-white font-bold">Movie 1</h3>
+                <p class="text-gray-600">SPIDERMAN WONDERS</p>
+                <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded popup-button" onclick="Popup()">Close</button>
+            </div>
+        </div>
+
+
+        <section class="mb-8">
+            <h2 class="text-xl text-center font-bold mb-4">
+                Select Your Seats
+            </h2>
+            <div class="bg-black p-4 rounded shadow">
+                <div class="text-center mb-4">
+                    <div class="screen-icon"></div>
+                    <div class="text-white py-2">
+                        Screen
+                    </div>
+                </div>
+                <div class="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        A1
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        A2
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        A3
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        A4
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        A5
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        A6
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        A7
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        A8
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        B1
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        B2
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        B3
+                    </div>
+
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        B4
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        B5
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        B6
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        B7
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        B8
+                    </div>
+
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        C1
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        C2
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        C3
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        C4
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        C5
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        C6
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        C7
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        C8
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        D1
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        D2
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        D3
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        D4
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        D5
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        D6
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        D7
+                    </div>
+                    <div class="bg-gray-300 p-2 rounded text-center seat rounded shadow-lg transition transform hover:scale-105">
+                        D8
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="snacks">
+            <h2 class="text-xl text-center font-bold mb-4">
+                Available Snacks
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-black p-4 rounded shadow-lg transition transform hover:scale-105">
+                    <img alt="Image of a box of popcorn with butter" class="w-full h-48 object-cover rounded mb-4" height="200" src="https://storage.googleapis.com/a1aa/image/mVheFjptgzTpYqpGveVbfffH2HEgIDcrte5Qt9b7SE0shX88E.jpg" width="300" />
+                    <h3 class="text-white font-bold">Popcorn</h3>
+                    <p class="text-gray-600">$5.00</p>
+                    <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg transition transform hover:scale-105 snack-button" data-snack="Popcorn">Add to Cart</button>
+                </div>
+                <div class="bg-black p-4 rounded shadow-lg transition transform hover:scale-105">
+                    <img alt="Image of a large soda cup with a straw" class="w-full h-48 object-cover rounded mb-4" height="200" src="https://storage.googleapis.com/a1aa/image/vDLq9W3eUAToNybpPtgdTsP0Fx106HeFfebq61YZXqH83FPPB.jpg" width="300" />
+                    <h3 class="text-white font-bold">Soda</h3>
+                    <p class="text-gray-600">$3.00</p>
+                    <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg transition transform hover:scale-105 snack-button" data-snack="Soda">Add to Cart</button>
+                </div>
+                <div class="bg-black p-4 rounded shadow-lg transition transform hover:scale-105">
+                    <img alt="Image of a box of nachos with cheese dip" class="w-full h-48 object-cover rounded mb-4" height="200" src="https://storage.googleapis.com/a1aa/image/fOK5gqG7v62YMypxV9MmSQFYPYVEydEWIBlsfzKZ8YuDeinnA.jpg" width="300" />
+                    <h3 class="text-white font-bold">Nachos</h3>
+                    <p class="text-gray-600">$4.00</p>
+                    <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg transition transform hover:scale-105 snack-button" data-snack="Nachos">Add to Cart</button>
+                </div>
+                <div class="bg-black p-4 rounded shadow-lg transition transform hover:scale-105">
+                    <img alt="Image of a hot dog with mustard and ketchup" class="w-full h-48 object-cover rounded mb-4" height="200" src="https://storage.googleapis.com/a1aa/image/2VTdg1NG8o5gOBJ2HnQn2i6ou8QAKkNSmFYeG004TRWCv45JA.jpg" width="300" />
+                    <h3 class="text-white font-bold">Hot Dog</h3>
+                    <p class="text-gray-600">$4.50</p>
+                    <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg transition transform hover:scale-105 snack-button" data-snack="Hot Dog">Add to Cart</button>
+                </div>
+                <div class="bg-black p-4 rounded shadow-lg transition transform hover:scale-105">
+                    <img alt="Image of a box of candy with various colorful candies" class="w-full h-48 object-cover rounded mb-4" height="200" src="https://gettyimagesgallery.com/wp-content/uploads/2020/03/GettyImages-536975153.jpg" width="300" />
+                    <h3 class="text-white font-bold">Candy</h3>
+                    <p class="text-gray-600">$2.50</p>
+                    <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg transition transform hover:scale-105 snack-button" data-snack="Candy">Add to Cart</button>
+                </div>
+                <div class="bg-black p-4 rounded shadow-lg transition transform hover:scale-105">
+                    <img alt="Image of a pretzel with salt" class="w-full h-48 object-cover rounded mb-4" height="200" src="https://storage.googleapis.com/a1aa/image/kWvS7K0k0NJKBpXsE39kok0IPhz7cdEkLlVlVsNzybqgX88E.jpg" width="300" />
+                    <h3 class="text-white font-bold">Pretzel</h3>
+                    <p class="text-gray-600">$3.50</p>
+                    <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg transition transform hover:scale-105 snack-button" data-snack="Pretzel">Add to Cart</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-8" id="cart">
+            <h2 class="text-xl text-center font-bold mb-4">Cart</h2>
+            <div class="bg-black p-4 rounded">
+                <h3 class="text-white font-bold mb-2">Selected Items</h3>
+                <ul id="cart-items" class="mb-4"></ul>
+                <div class="flex justify-between font-bold">
+                    <span class="text-white font-bold mb-2">Total</span>
+                    <span id="total-price" class="text-white font-bold mb-2">$0.00</span>
+                </div>
+            </div>
+        </section>
+        <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg transition transform hover:scale-105 w-full">
+            Proceed to Payment
+        </button>
+    </main>
+
+    <footer class="bg-black text-white p-4 mt-8">
+        <section id="contact">
+            <div class="container mx-auto text-center">
+                <p>
+                    © 2024 FastTic. All rights reserved.
+                    <br />
+                    CONTACT: bookatfastic@gmail.com
+                </p>
+            </div>
+        </section>
+    </footer>
+</body>
+
+</html>
